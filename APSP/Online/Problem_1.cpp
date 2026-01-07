@@ -15,8 +15,8 @@ void solve()
     for(int i=0;i<m;i++)
     {
         ll u,v,w; cin>>u>>v>>w;
-        mat[u][v]=w;
-        mat[v][u]=w;
+        mat[u][v]=min(mat[u][v],w);
+        mat[v][u]=min(mat[v][u],w);
     }
 
     for(int k=1;k<=n;k++)
