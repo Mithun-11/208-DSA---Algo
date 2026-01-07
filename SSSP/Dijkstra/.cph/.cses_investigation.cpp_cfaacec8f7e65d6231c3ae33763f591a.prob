@@ -1,0 +1,1 @@
+{"name":"Local: cses_investigation","url":"d:\\208 DSA + Algo\\SSSP\\Dijkstra\\cses_investigation.cpp","tests":[{"id":1765434484981,"input":"4 5\n1 4 5\n1 2 4\n2 4 5\n1 3 2\n3 4 3","output":""}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"d:\\208 DSA + Algo\\SSSP\\Dijkstra\\cses_investigation.cpp","group":"local","local":true}
