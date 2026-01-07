@@ -24,3 +24,5 @@ signed main()
 }
 
 //g++ -std=c++17 -o program filename.cpp && ./program
+
+// g++ -std=c++17 -O2 -o program filename.cpp && ./program < input.txt > output.txt
