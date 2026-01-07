@@ -55,10 +55,10 @@ void solve() {
 
         // 5. Find and remove the "best" edge (max weight)
         int best_edge = -1;
-        int max_w = INT_MIN;
+        int max_w = INT_MAX;
         
         for (int id : cycle_indices) {
-            if (edges[id].w > max_w) {
+            if (edges[id].w < max_w) {
                 max_w = edges[id].w;
                 best_edge = id;
             }
