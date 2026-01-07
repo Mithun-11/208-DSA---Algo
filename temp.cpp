@@ -22,3 +22,5 @@ signed main()
     }
 
 }
+
+//g++ -std=c++17 -o program filename.cpp && ./program
