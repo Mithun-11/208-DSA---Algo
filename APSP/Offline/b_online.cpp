@@ -3,27 +3,27 @@ using namespace std;
 using ll=long long;
 const ll INF=1e18;
 vector<vector<pair<int,int>>>adj;
- // 1 based indexing
+ // 0 based indexing
 void solve()
 {
-    ll n,m,q; cin>>n>>m>>q;
+    ll n,m,q; cin>>n>>m;
 
     vector<vector<ll>>mat(n+1,vector<ll>(n+1,INF));
 
-    for(int i=1;i<=n;i++)  mat[i][i]=0;
+    for(int i=0;i<=n;i++)  mat[i][i]=0;
 
     for(int i=0;i<m;i++)
     {
         ll u,v,w; cin>>u>>v>>w;
         mat[u][v]=min(mat[u][v],w);
-        mat[v][u]=min(mat[v][u],w);
+        // mat[v][u]=min(mat[v][u],w);
     }
 
-    for(int k=1;k<=n;k++)
+    for(int k=0;k<n;k++)
     {
-        for(int i=1;i<=n;i++)
+        for(int i=0;i<n;i++)
         {
-            for(int j=1;j<=n;j++)
+            for(int j=0;j<n;j++)
                { 
                 if(mat[i][k]!=INF && mat[k][j]!=INF)
                     mat[i][j]=min(mat[i][j],mat[i][k]+mat[k][j]);
@@ -31,12 +31,15 @@ void solve()
         }
     }
 
+    ll y,z; cin>>y>>z>>q;
+
     for(int i=0;i<q;i++)
     {
         ll u,v; cin>>u>>v;
 
-        if(mat[u][v]==INF) cout<<-1;
-        else cout<<mat[u][v];
+        ll ans= min(mat[u][y]+mat[y][v],mat[u][z]+mat[z][v]);
+        if(ans>=INF) cout<<-1;
+        else cout<<ans;
 
         cout<<endl;
     }
