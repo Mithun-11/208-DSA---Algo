@@ -86,3 +86,7 @@ signed main()
     }
 
 }
+
+//g++ -o program filename.cpp && ./program
+
+// g++ -O2 -o program filename.cpp && ./program < input.txt > output.txt
