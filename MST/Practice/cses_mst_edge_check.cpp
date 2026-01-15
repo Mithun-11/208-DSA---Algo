@@ -1,7 +1,8 @@
 #include<bits/stdc++.h>
 using namespace std;
+#define endl '\n'
 
-// --- DSU Boilerplate (Standard) ---
+
 vector<int> parent;
 vector<int> sze;
 void make_set(int n) {
@@ -22,7 +23,7 @@ void union_sets(int a, int b) {
         sze[a] += sze[b];
     }
 }
-// ----------------------------------
+
 
 struct Edge {
     int u, v, w, id;
@@ -43,7 +44,7 @@ void solve() {
     
     make_set(n);
     sort(edges.begin(), edges.end());
-    vector<string> results(m);
+    vector<bool> results(m,false);
     
     // Group edges by weight
     map<int, vector<Edge>> batches;
@@ -55,7 +56,7 @@ void solve() {
     for(auto& [weight, batch] : batches) {
         // Check phase
         for(auto& [u, v, w, id] : batch) {
-            results[id] = (find_set(u) != find_set(v)) ? "YES" : "NO";
+            if(find_set(u)!=find_set(v)) results[id]=true;
         }
         // Union phase
         for(auto& [u, v, w, id] : batch) {
@@ -63,8 +64,11 @@ void solve() {
         }
     }
     
-    for(const auto& res : results) {
-        cout << res << "\n";
+    for(int i=0;i<m;i++) 
+    {
+        if(results[i]) cout<<"YES";
+        else cout<<"NO";
+        cout<<endl;
     }
 }
 
