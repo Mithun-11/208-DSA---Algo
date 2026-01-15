@@ -7,6 +7,7 @@ using tiii=tuple<int,int,int>; // weight,u,v
 
 vector<int> parent;
 vector<int>rnk;
+// vector<int>sze; 
 
 void make_set(int v) {
     parent[v] = v;
@@ -30,6 +31,18 @@ void union_sets(int a, int b) {
             rnk[a]++;
     }
 }
+
+// void union_sets(int a, int b) {
+//     a = find_set(a);
+//     b = find_set(b);
+//     if (a != b) {
+//         if (sze[a] < sze[b])
+//             swap(a, b);
+//         parent[b] = a;
+//         sze[a] += sze[b];
+//      
+//     }
+// }
 
 
 void solve() // 0 based indexing for vertices
