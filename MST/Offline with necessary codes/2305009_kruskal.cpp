@@ -9,9 +9,10 @@ vector<int> parent;
 vector<int>rnk;
 // vector<int>sze; 
 
-void make_set(int v) {
-    parent[v] = v;
-    rnk[v] = 0;
+void make_set(int n) {
+    parent.resize(n);
+    iota(parent.begin(), parent.end(), 0);
+    rnk.assign(n, 0);
 }
 
 int find_set(int v) {
@@ -48,8 +49,6 @@ void union_sets(int a, int b) {
 void solve() // 0 based indexing for vertices
 {
     int n,m; cin>>n>>m;
-    parent.resize(n);
-    rnk.resize(n);
     vector<tiii>edges;
 
     for(int i=0;i<m;i++)
@@ -63,10 +62,7 @@ void solve() // 0 based indexing for vertices
     ll cost=0;
     vector<pair<int,int>>mst; //u,v
 
-    for(int i=0;i<n;i++)
-    {
-        make_set(i);
-    }
+    make_set(n);
 
     sort(edges.begin(),edges.end());
 
