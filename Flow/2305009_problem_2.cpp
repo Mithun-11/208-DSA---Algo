@@ -52,19 +52,22 @@ ll bfs(int s,int t)
 
 void solve()
 {
-    int n,m; // remember 0 based indexing for nodes here
-    cin>>n>>m;
-    adj.resize(n);
-    par_idx.resize(n);
+    int n,k,m; // remember 0 based indexing for nodes here
+    cin>>n>>k>>m;
+    adj.resize(n+2);
+    par_idx.resize(n+2);
 
     for(int i=0;i<m;i++)
     {
         int u,v;
-        int c; cin>>u>>v>>c;
-        add_edge(u,v,c);
+        cin>>u>>v;
+        add_edge(u,v,1);
         
     }
-    int s,t; cin>>s>>t;
+    int s=n,t=n+1;
+
+    for(int i=0;i<k;i++) add_edge(s,i,1);
+    for(int i=k;i<n;i++) add_edge(i,t,1);
 
     ll max_flow=0;
     ll path_flow;
@@ -89,7 +92,7 @@ void solve()
         int id=i*2;
         auto[u,v,cap,flow]=edges[id];
 
-        cout<<u<<" "<<v<<" "<<flow<<"/"<<cap<<endl;      
+        if(flow==1) cout<<u<<" "<<v<<endl;
     }
 
 
