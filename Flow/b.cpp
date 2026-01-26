@@ -50,29 +50,60 @@ ll bfs(int s,int t)
     return 0;
 }
 
+void bfs2(vector<vector<int>>&g,vector<bool>&vis,int s)
+{
+    queue<int>q;
+    q.push(s);
+    vis[s]=true;
+
+    while(!q.empty())
+    {
+        int u=q.front();
+        q.pop();
+
+        for(int v: g[u])
+        {
+            if(!vis[v])
+            {
+                vis[v]=true;
+                q.push(v);
+            }
+        }
+
+    }
+}
+
 void solve()
 {
-    int n,k,m; // remember 0 based indexing for nodes here
-    cin>>n>>k>>m;
-    adj.resize(n+2);
-    par_idx.resize(n+2);
+    int n,m; // remember 0 based indexing for nodes here
+    cin>>n>>m;
+    adj.resize(n);
+    par_idx.resize(n);
 
     for(int i=0;i<m;i++)
     {
         int u,v;
-        cin>>u>>v;
-        add_edge(u,v,1);
+    
+        int c; cin>>u>>v>>c;
+        u--,v--;
+        add_edge(u,v,c);
         
     }
-    int s=n,t=n+1;
-
-    for(int i=0;i<k;i++) add_edge(s,i,1);
-    for(int i=k;i<n;i++) add_edge(i,t,1);
+    int p; cin>>p;
+    vector<tuple<int,int,int>>flyovers;
+    for(int i=0;i<p;i++)
+    {
+        int u,v,w; cin>>u>>v>>w;
+        u--,v--;
+        flyovers.push_back({u,v,w});
+    }
+    int s,t; 
+    s=0,t=n-1;
 
     ll max_flow=0;
     ll path_flow;
 
-    while((path_flow=bfs(s,t)))
+    while(path_flow=bfs(s,t))
     {
         int cur=t;
         while(cur!=s)
@@ -85,15 +116,32 @@ void solve()
         max_flow+=path_flow;
     }
 
-    cout<<max_flow<<endl;
+    vector<vector<int>>fwd_adj(n);
+    vector<vector<int>>bwd_adj(n);
 
-    for(int i=0;i<m;i++)
+    for(auto e: edges)
     {
-        int id=i*2;
-        auto[u,v,cap,flow]=edges[id];
-
-        if(flow==1) cout<<u<<" "<<v<<endl;
+        if(e.cap-e.flow>0) {
+            fwd_adj[e.u].push_back(e.v);
+            bwd_adj[e.v].push_back(e.u);
+        }
     }
+
+    vector<bool>from_source(n,false);
+    vector<bool>from_sink(n,false);
+
+
+    bfs2(fwd_adj,from_source,s);
+    bfs2(bwd_adj,from_sink,t);
+
+    for(int i=0;i<p;i++)
+    {
+        auto[u,v,w]=flyovers[i];
+
+        if(from_source[u] && from_sink[v] && w>0) cout<<i+1<<" ";
+    }
+
+    
 
 
 }

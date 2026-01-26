@@ -69,7 +69,7 @@ void solve()
     ll max_flow=0;
     ll path_flow;
 
-    while(path_flow=bfs(s,t))
+    while((path_flow=bfs(s,t)))
     {
         int cur=t;
         while(cur!=s)

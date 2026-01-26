@@ -53,26 +53,27 @@ ll bfs(int s,int t)
 void solve()
 {
     int n,k,m; // remember 0 based indexing for nodes here
-    cin>>n>>k>>m;
-    adj.resize(n+2);
-    par_idx.resize(n+2);
+    cin>>n>>m>>k;
+    adj.resize(n+2+m); 
+    par_idx.resize(n+2+m);
 
-    for(int i=0;i<m;i++)
+    for(int i=0;i<k;i++)
     {
         int u,v;
         cin>>u>>v;
-        add_edge(u,v,1);
+        u--,v--;
+        add_edge(u,v+n,1);
         
     }
-    int s=n,t=n+1;
+    int s=n+m,t=n+m+1;
 
-    for(int i=0;i<k;i++) add_edge(s,i,1);
-    for(int i=k;i<n;i++) add_edge(i,t,1);
+    for(int i=0;i<n;i++) add_edge(s,i,1);
+    for(int i=n;i<n+m;i++) add_edge(i,t,1);
 
     ll max_flow=0;
     ll path_flow;
 
-    while((path_flow=bfs(s,t)))
+    while(path_flow=bfs(s,t))
     {
         int cur=t;
         while(cur!=s)
@@ -87,12 +88,12 @@ void solve()
 
     cout<<max_flow<<endl;
 
-    for(int i=0;i<m;i++)
+    for(int i=0;i<k;i++)
     {
         int id=i*2;
         auto[u,v,cap,flow]=edges[id];
 
-        if(flow==1) cout<<u<<" "<<v<<endl;
+        if(flow==1) cout<<u+1<<" "<<v+1-n<<endl;
     }
 
 
