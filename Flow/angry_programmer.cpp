@@ -67,7 +67,7 @@ void solve()
     par_idx.resize(2*n+5);
     add_edge(1,1+n,1e9);
     add_edge(n,n+n,1e9);
-
+ 
     for(int i=2;i<=n-1;i++)
     {
         int c; cin>>c;
