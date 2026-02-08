@@ -1,5 +1,4 @@
 #include<bits/stdc++.h>
-#include <iomanip>
 using namespace std;
 using ll=long long;
 const ll INF=1e18;
@@ -51,71 +50,67 @@ int prevPrime(int n)
     return n;
 }
 
-template<typename K> 
-string toStringKey(const K& key)
-{
-    return to_string(key);
+// --- GENERIC HASH FUNCTIONS ---
+
+// 1. Primary Helper: Convert ANY key to a string (The lazy but effective way)
+template <typename K>
+string to_string_key(const K& key) {
+    // This handles int, long, float, double automatically
+    return to_string(key); 
 }
 
-string toStringKey(const string& key)
-{
+// Specialization for string (so we don't convert string to string)
+string to_string_key(const string& key) {
     return key;
 }
 
 
-
-
-//FMV-1a
-template<typename K>
+// --- FNV-1a (Generic) ---
+template <typename K>
 int Hash1(const K& key, int tableSize) {
-
-    string s=toStringKey(key);
+    string s = to_string_key(key); // Convert key to string first
 
     const unsigned int FNV_PRIME = 16777619u;
     const unsigned int FNV_OFFSET_BASIS = 2166136261u;
     
     unsigned int hashValue = FNV_OFFSET_BASIS;
     
-
-    for (char c: s) {
+    for (char c : s) {
         hashValue ^= (unsigned int)c;
         hashValue *= FNV_PRIME;
     }
     
-
     return (int)(hashValue % tableSize);
 }
 
 
-//Rolling Hash
-template<typename K>
+// --- Rolling Hash (Generic) ---
+template <typename K>
 int Hash2(const K& key, int tableSize) {
-    string s= toStringKey(key);
+    string s = to_string_key(key); // Convert key to string first
 
     const int BASE = 31;
     const unsigned long long MODULUS = 1000000007ULL;
     
     unsigned long long hashValue = 0;
     
-
-    for (char c: s) {
+    for (char c : s) {
         hashValue = (hashValue * BASE + (unsigned long long)c) % MODULUS;
     }
     
-
     return (int)(hashValue % tableSize);
 }
 
 
-//auxiliary hash
-template<typename K>
+// --- Auxiliary Hash (Generic) ---
+template <typename K>
 int auxHash(const K& key, int tableSize) {
-    string s=toStringKey(key);
+    string s = to_string_key(key); // Convert key to string first
 
-    const int AUX_BASE = 37;  
+    const int AUX_BASE = 37;
     unsigned int hashValue = 0;
 
-    for (char c: s) {
+    for (char c : s) {
         hashValue = hashValue * AUX_BASE + (unsigned int)c;
     }
     
@@ -248,7 +243,11 @@ class HashTable {
                 else if(openTable[index].state==OCCUPIED)
                 {
                     if(openTable[index].key==key) break;
-                    else collisionCount++;
+                    if(collision==false)
+                    {
+                        collision=true;
+                        collisionCount++;
+                    }
                 }
                     
             }
@@ -261,6 +260,7 @@ class HashTable {
             int oldSize=tableSize;
             tableSize=newSize;
             numElements=0;
+            collisionCount=0;
 
             if(colType==CHAINING)
             {
@@ -416,17 +416,16 @@ class HashTable {
         {
             return hits;
         }
+        
+
+
+
 
 
 };
 
-struct Report{
-    int collisions;
-    double avgHits;
-};
 
-
-Report run(CollisionResolution colType, HashFunction hashType, vector<string>& words, 
+void run(string name, CollisionResolution colType, HashFunction hashType, vector<string>& words, 
     vector<string>& searchWords)
 {
     HashTable<string,int> ht(colType,hashType);
@@ -441,7 +440,9 @@ Report run(CollisionResolution colType, HashFunction hashType, vector<string>& w
         ht.search(word);
     }
 
-    return { ht.getCollisionCount(), (double)ht.getHits()/searchWords.size()};
+    cout<<"Hash Funtion: "<<name<<endl;
+    cout<<"Total Collisions: "<<ht.getCollisionCount()<<endl;
+    cout<<"Average Hits: "<< (double)ht.getHits()/searchWords.size()<<endl;
 }
 
 
@@ -459,52 +460,21 @@ void solve()
     shuffle(searchWords.begin(), searchWords.end(), std::default_random_engine(seed));
     searchWords.resize(q);
 
-    //Chaining
-    Report r1_chain = run(CHAINING,HASH1,words,searchWords);
-    Report r2_chain = run(CHAINING,HASH2,words,searchWords);
+    cout<<"--- CHAINING METHOD ---"<<endl;
+    run("FNV-1a",CHAINING,HASH1,words,searchWords);
+    run("Polynomial Rolling Hash",CHAINING,HASH2,words,searchWords);
 
-    //Double Hashing
-    Report r1_double = run(DOUBLE_HASHING,HASH1,words,searchWords);
-    Report r2_double = run(DOUBLE_HASHING,HASH2,words,searchWords);
+    cout<<endl;
 
-    // Custom Probing
-    Report r1_custom = run(CUSTOM_PROBING,HASH1,words,searchWords);
-    Report r2_custom = run(CUSTOM_PROBING,HASH2,words,searchWords);
+    cout<<"--- DOUBLE HASHING ---"<<endl;
+    run("FNV-1a",DOUBLE_HASHING,HASH1,words,searchWords);
+    run("Polynomial Rolling Hash",DOUBLE_HASHING,HASH2,words,searchWords);
 
-    cout << "--------------------------------------------------------------------------------------" << endl;
-    cout << setw(20) << " " << " | " 
-         << setw(28) << "Hash 1(FNV-1a)" << " | " 
-         << setw(28) << "Hash 2(Polynomial Rolling)" << " |" << endl;
-    
-    cout << "--------------------------------------------------------------------------------------" << endl;
-    
-    cout << setw(20) << "Method" << " | "
-         << setw(13) << "Collisions" << setw(15) << "Avg Hits" << " | "
-         << setw(13) << "Collisions" << setw(15) << "Avg Hits" << " |" << endl;
+    cout<<endl;
 
-    cout << "--------------------------------------------------------------------------------------" << endl;
-
-    // Row 1: Chaining
-    cout << setw(20) << "Chaining Method" << " | "
-         << setw(13) << r1_chain.collisions << setw(15) << setprecision(5) << r1_chain.avgHits << " | "
-         << setw(13) << r2_chain.collisions << setw(15) << setprecision(5) << r2_chain.avgHits << " |" << endl;
-
-    cout << "--------------------------------------------------------------------------------------" << endl;
-
-    // Row 2: Double Hashing
-    cout << setw(20) << "Double Hashing" << " | "
-         << setw(13) << r1_double.collisions << setw(15) << r1_double.avgHits << " | "
-         << setw(13) << r2_double.collisions << setw(15) << r2_double.avgHits << " |" << endl;
-
-    cout << "--------------------------------------------------------------------------------------" << endl;
-
-    // Row 3: Custom Probing
-    cout << setw(20) << "Custom Probing" << " | "
-         << setw(13) << r1_custom.collisions << setw(15) << r1_custom.avgHits << " | "
-         << setw(13) << r2_custom.collisions << setw(15) << r2_custom.avgHits << " |" << endl;
-
-    cout << "--------------------------------------------------------------------------------------" << endl;
-
+    cout<<"--- CUSTOM PROBING ---"<<endl;
+    run("FNV-1a",CUSTOM_PROBING,HASH1,words,searchWords);
+    run("Polynomial Rolling Hash",CUSTOM_PROBING,HASH2,words,searchWords);
 
 }
 
