@@ -45,6 +45,7 @@ private:
         Node* T2=y->left;
 
         x->right=T2;
+        if(T2!=LNULL) T2->parent=x;
         y->parent=x->parent;
 
         if(x->parent==nullptr) root=y;
@@ -64,6 +65,7 @@ private:
         Node* T2=y->right;
 
         x->left=T2;
+        if(T2!=LNULL) T2->parent=x;
         y->parent=x->parent;
 
         if(x->parent==nullptr) root=y;
@@ -255,40 +257,43 @@ public:
         delete LNULL;
     }
 
-    Node* search(K k)
+    Node* search(K key)
     {
         Node* curr=root;
         while(curr!=LNULL)
         {
-            if(curr->key==k) return curr;
-            if(k<curr->key) curr=curr->left;
+            if(curr->key==key) return curr;
+            if(key<curr->key) curr=curr->left;
             else curr=curr->right;
         }
         return nullptr;
     }
 
-    bool insert(K k,V v=V())
+    bool insert(K key,V value=V())
     {
-        //already exists
-        if(search(k)!=nullptr) return false;
 
-        Node* node= new Node(k,LNULL,v); 
+        Node* node= new Node(key,LNULL,value); 
 
-        Node* y=nullptr;
-        Node* x=root;
+        Node* p=nullptr;
+        Node* curr=root;
 
-        while(x!=LNULL)
+        while(curr!=LNULL)
         {
-            y=x;
-            x->size++;
-            if(node->key<x->key) x=x->left;
-            else x=x->right;
+            p=curr;
+            curr->size++;
+            if(key<curr->key) curr=curr->left;
+            else if(key > curr->key) curr=curr->right;
+            else 
+            {
+                delete node;
+                return false;
+            }
         }
 
-        node->parent=y;
-        if(y==nullptr) root=node;
-        else if(node->key<y->key) y->left=node;
-        else y->right=node;
+        node->parent=p;
+        if(p==nullptr) root=node;
+        else if(node->key<p->key) p->left=node;
+        else p->right=node;
 
         //fixing
         if(node->parent==nullptr) // inserted at root
@@ -313,9 +318,9 @@ public:
         return node;
     }
 
-    bool remove(K k)
+    bool remove(K key)
     {
-        Node* z=search(k);
+        Node* z=search(key);
         if(z==nullptr) return false;
 
         Node* y=z;
@@ -366,19 +371,19 @@ public:
         return true;
     }
 
-    int countLessThan(K k)
+    int countLessThan(K key)
     {
         int count=0;
         Node* curr=root;
 
         while(curr!=LNULL)
         {
-            if(curr->key==k)
+            if(curr->key==key)
             {
                 count+=curr->left->size;
                 return count;
             }
-            else if(k>curr->key)
+            else if(key>curr->key)
             {
                 count+=curr->left->size+1;
                 curr=curr->right;
