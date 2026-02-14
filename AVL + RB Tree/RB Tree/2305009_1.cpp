@@ -271,6 +271,7 @@ public:
 
     bool insert(K key,V value=V())
     {
+        if(search(key)!=nullptr) return false;
 
         Node* node= new Node(key,LNULL,value); 
 
@@ -283,11 +284,6 @@ public:
             curr->size++;
             if(key<curr->key) curr=curr->left;
             else if(key > curr->key) curr=curr->right;
-            else 
-            {
-                delete node;
-                return false;
-            }
         }
 
         node->parent=p;
