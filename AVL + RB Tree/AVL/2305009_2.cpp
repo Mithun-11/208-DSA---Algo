@@ -112,7 +112,7 @@ private:
         else if(u==u->parent->left) u->parent->left=v;
         else u->parent->right=v;
 
-        v->parent=u->parent;
+        if(v!=nullptr)v->parent=u->parent;
     }
 
     Node* getSuccessor(Node* node)
@@ -222,8 +222,9 @@ public:
         curr=node->parent;
         while(curr!=nullptr)
         {
+            p=curr->parent;
             rebalance(curr);
-            curr=curr->parent;
+            curr=p;
         }
 
         return true;
@@ -272,10 +273,12 @@ public:
         delete z;
 
         Node* curr=x_parent;
+        Node* p;
         while(curr!=nullptr)
         {
+            p=curr->parent;
             rebalance(curr);
-            curr=curr->parent;
+            curr=p;
         }
 
         return true;
