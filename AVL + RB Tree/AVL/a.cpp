@@ -40,85 +40,250 @@ private:
         y->left=x;
         x->right=T2;
 
-        y->height = 1 + max(height(y->left),height(y->right));
         x->height = 1 + max(height(x->left),height(x->right));
+        y->height = 1 + max(height(y->left),height(y->right));
 
         return y;
     }
 
-    Node* rightRotate(Node* y)
+    Node* rightRotate(Node* x)
     {
-        Node* x= y->left;
-        Node* T2= x->right;
+        Node* y= x->left;
+        Node* T2= y->right;
 
-        x->right=y;
-        y->left=T2;
+        y->right=x;
+        x->left=T2;
 
-        y->height = 1 + max(height(y->left),height(y->right));
         x->height = 1 + max(height(x->left),height(x->right));
+        y->height = 1 + max(height(y->left),height(y->right));
 
-        return x;
+        return y;
     }
 
-    Node* insertPrivate(Node* node,K key,V value,bool& success)
+    Node* balanceAVL(Node* root)
     {
-        if(node==nullptr) 
+        root->height= 1 + max(height(root->left),height(root->right));
+        int balance=getBalance(root);
+
+        if(balance>1)
+        {
+            if(getBalance(root->left)>=0) return rightRotate(root);
+            else 
+            {
+                root->left=leftRotate(root->left);
+                return rightRotate(root);
+            }
+        }
+
+        if(balance<-1)
+        {
+            if(getBalance(root->right)<=0) return leftRotate(root);
+            else 
+            {
+                root->right=rightRotate(root->right);
+                return leftRotate(root);
+            }
+        }
+
+        return root;
+    }
+
+    Node* insertPrivate(Node* root,K key,V value,bool& success)
+    {
+        if(root==nullptr) 
         {
             success=true;
             return new Node(key,value);
         }
 
-        if(key < node->key ) node->left = insertPrivate(node->left,key,value,success);
+        if(key < root->key ) root->left = insertPrivate(root->left,key,value,success);
 
-        else if(key > node->key) node->right = insertPrivate(node->right,key,value,success);
+        else if(key > root->key) root->right = insertPrivate(root->right,key,value,success);
 
         else 
         {
             success=false;
-            return node;
+            return root;
         }
 
-        node->height= 1 + max(height(node->left),height(node->right));
-        int balance=getBalance(node);
+        return balanceAVL(root);
+    }
 
-        if(balance>1 && key < node->left->key) return rightRotate(node);
+    Node* getSuccessor(Node* node)
+    {
+        node=node->right;
 
-        if(balance<-1 && key > node->right->key) return leftRotate(node);
-
-        if(balance>1 && key > node->left->key)
-        {
-            node->left=leftRotate(node->left);
-            return rightRotate(node);
-        }
-
-        if(balance<-1 && key < node->right->key)
-        {
-            node->right=rightRotate(node->right);
-            return leftRotate(node);
-        }
+        while(node!=nullptr && node->left!=nullptr) node=node->left;
 
         return node;
     }
 
-    Node* removePrivate(Node* node,K key,bool& success)
+    Node* removePrivate(Node* root,K key,bool& success)
     {
-        if(node==nullptr)
+        if(root==nullptr)
         {
             success=false;
-            return node;
+            return root;
         }
 
-        // continue the logic from here
-        // first regular BST deletion 
-        // Then the 4 cases of insert
+        if(key < root->key) root->left=removePrivate(root->left,key,success);
+
+        else if(key > root->key) root->right=removePrivate(root->right,key,success);
+
+        else 
+        {
+            success=true;
+
+            if(root->left==nullptr)
+            {
+                Node* temp=root->right;
+                delete root;
+                return temp;
+            }
+
+            else if(root->right==nullptr)
+            {
+                Node* temp=root->left;
+                delete root;
+                return temp;
+            }
+
+            else 
+            {
+                Node* succ=getSuccessor(root);
+                root->key=succ->key;
+                root->value=succ->value;
+                bool dummy;
+                root->right=removePrivate(root->right,succ->key,dummy);
+            }
+        }
+
+        if(root==nullptr) return root;
+
+        return balanceAVL(root);
     }
 
-    
+    void preOrder(Node* root)
+    {
+        if(root==nullptr) return;
+
+        cout<<root->key<<" ";
+        preOrder(root->left);
+        preOrder(root->right);
+    }
+
+    void inOrder(Node* root)
+    {
+        if(root==nullptr) return;
+
+        inOrder(root->left);
+        cout<<root->key<<" ";
+        inOrder(root->right);
+    }
+
+    void postOrder(Node* root)
+    {
+        if(root==nullptr) return;
+
+        postOrder(root->left);
+        postOrder(root->right);
+        cout<<root->key<<" ";
+    }
+
+    void levelOrder(Node* root)
+    {
+        if(root==nullptr) return;
+
+        queue<Node*>q;
+        q.push(root);
+
+        while(!q.empty())
+        {
+            Node* curr=q.front();
+            cout<<curr->key<<" ";
+            q.pop();
+
+            if(curr->left!=nullptr) q.push(curr->left);
+            if(curr->right!=nullptr) q.push(curr->right);
+        }
+    }
+
+    void destroy(Node* root)
+    {
+        if(root==nullptr) return;
+        destroy(root->left);
+        destroy(root->right);
+        delete root;
+    }
+
+
+public:
+    AVLTree() : root(nullptr) {}
+    ~AVLTree() {destroy(root); }
+
+    bool insert(K key, V value=V())
+    {
+        bool success=false;
+        root= insertPrivate(root,key,value,success);
+
+        return success;
+    }
+
+    bool remove(K key)
+    {
+        bool success=false;
+        root= removePrivate(root,key,success);
+
+        return success;
+    }
+
+    void traversal(int type)
+    {
+        if(type==1) preOrder(root);
+        else if(type==2) inOrder(root);
+        else if(type==3) postOrder(root);
+        else if(type==4) levelOrder(root);
+        else 
+        {
+            cout<<"Error";
+        }
+
+        cout<<endl;
+    }
 
 };
 
 void solve()
 {
+    freopen("input.txt","r",stdin);
+    freopen("output.txt","w",stdout);
+
+    int n; 
+    if(!(cin>>n)) return;
+    cout<<n<<endl;
+    AVLTree<int,int> tree;
+
+    for(int i=0;i<n;i++)
+    {
+        int e,r; cin>>e>>r;
+
+        if(e==1)
+        {
+            bool success=tree.insert(r);
+            cout<<"1 "<<r<<" "<<(success ? 1: 0)<<endl;
+        }
+
+        else if(e==0)
+        {
+            bool success=tree.remove(r);
+            cout<<"0 "<<r<<" "<<(success ? 1: 0)<<endl;
+        }
+        else if(e==2)
+        {
+            tree.traversal(r);
+        }
+
+    }
 
 }
 
