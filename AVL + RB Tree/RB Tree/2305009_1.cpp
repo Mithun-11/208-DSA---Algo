@@ -180,8 +180,8 @@ private:
                 //sibling is black but one nephew is red
                 else 
                 {
-                    //near nephew is RED
-                    if(sib->left->color==RED)
+                    //far nephew is black
+                    if(sib->right->color==BLACK)
                     {
                         sib->left->color=BLACK;
                         sib->color=RED;
@@ -189,7 +189,7 @@ private:
                         sib=x->parent->right;
                     }
 
-                    //near nephew is BLACK
+                    //far nephew is RED
                     sib->color=x->parent->color;
                     x->parent->color=BLACK;
                     sib->right->color=BLACK;
@@ -216,7 +216,7 @@ private:
                 }
                 else 
                 {
-                    if(sib->right->color==RED)
+                    if(sib->left->color==BLACK)
                     {
                         sib->right->color=BLACK;
                         sib->color=RED;
